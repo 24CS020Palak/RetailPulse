@@ -1,0 +1,204 @@
+{
+  "week": 2,
+  "checkpoint_day": 14,
+  "all_files_present": false,
+  "file_status": {
+    "../models/prophet_hybrid.pkl": true,
+    "../models/hybrid_config.json": true,
+    "../data/hybrid_forecast_results.csv": true,
+    "../models/churn_xgboost.pkl": true,
+    "../models/churn_metrics.json": true,
+    "../data/churn_features.csv": true,
+    "../data/churn_test_predictions.csv": true,
+    "../data/inventory_parameters.csv": true,
+    "../data/reorder_recommendations.csv": true,
+    "../data/abc_classification.csv": true,
+    "../models/inventory_config.json": true,
+    "../models/day11_tuning_results.json": true,
+    "../data/permutation_importance.csv": true,
+    "../models/day12_drift_summary.json": false,
+    "../airflow_dags/retailpulse_retraining_dag.py": true,
+    "../models/day13_pipeline_config.json": true
+  },
+  "scorecard": [
+    {
+      "ID": "F03",
+      "Capability": "Demand Forecasting",
+      "Target": "MAPE <= 12%",
+      "Actual": "30.80% MAPE",
+      "Status": "FAIL"
+    },
+    {
+      "ID": "F04",
+      "Capability": "Churn Prediction (AUC-ROC)",
+      "Target": "AUC-ROC >= 0.88",
+      "Actual": "0.8143",
+      "Status": "FAIL"
+    },
+    {
+      "ID": "F04",
+      "Capability": "Churn Prediction (Precision@Top20%)",
+      "Target": "Precision@Top20% >= 0.75",
+      "Actual": "0.8863",
+      "Status": "PASS"
+    },
+    {
+      "ID": "F05",
+      "Capability": "Inventory Optimization",
+      "Target": "25-40% reduction in overstock/understock",
+      "Actual": "57.7% stockout reduction",
+      "Status": "CHECK"
+    }
+  ],
+  "forecasting": {
+    "model_type": "Hybrid_Prophet_LSTM",
+    "alpha": 0.85,
+    "formula": "hybrid = alpha * prophet_pred + (1 - alpha) * lstm_pred",
+    "lookback": 30,
+    "prophet_mape": 31.08152641906247,
+    "lstm_mape": 38.08063228092431,
+    "hybrid_mape": 30.802926121266626,
+    "scaler_min": 0.0,
+    "scaler_max": 184367.28,
+    "test_start_date": "2011-07-21",
+    "test_end_date": "2011-12-09"
+  },
+  "churn": {
+    "model_type": "XGBoost Churn Classifier",
+    "churn_window_days": 90,
+    "cutoff_date": "2011-09-10",
+    "n_customers": 5281,
+    "churn_rate": 0.5659912895284984,
+    "auc_roc": 0.8142646876662222,
+    "precision_at_top20": 0.8862559241706162,
+    "feature_columns": [
+      "Recency",
+      "Frequency",
+      "Monetary",
+      "UniqueProducts",
+      "TotalQuantity",
+      "Tenure",
+      "AvgOrderValue",
+      "AvgDaysBetweenOrders",
+      "AvgBasketSize",
+      "RecencyRatio"
+    ],
+    "scale_pos_weight": 0.766624843161857,
+    "promoted_at": "2026-06-17 17:53:28.157442",
+    "previous_production_auc": 0.8142646876662222,
+    "improvement": 0.0
+  },
+  "inventory": {
+    "lead_time_days": 7,
+    "service_level": 0.95,
+    "z_score": 1.6448536269514722,
+    "order_cost_gbp": 20.0,
+    "holding_cost_rate": 0.2,
+    "growth_factor": 1.1213888988525487,
+    "simulation_days": 180,
+    "total_stockout_reduction_pct": 57.74647887323944,
+    "avg_inventory_reduction_pct": -38.127181167214296,
+    "abc_summary": [
+      {
+        "ABC_Class": "A",
+        "NumProducts": 738,
+        "TotalRevenue": 12419708.98,
+        "PctOfProducts": 13.885230479774224,
+        "PctOfRevenue": 69.99610309488057
+      },
+      {
+        "ABC_Class": "B",
+        "NumProducts": 1095,
+        "TotalRevenue": 3548572.08,
+        "PctOfProducts": 20.602069614299154,
+        "PctOfRevenue": 19.99935888604813
+      },
+      {
+        "ABC_Class": "C",
+        "NumProducts": 3482,
+        "TotalRevenue": 1775148.118,
+        "PctOfProducts": 65.51269990592662,
+        "PctOfRevenue": 10.0045380190713
+      }
+    ]
+  },
+  "tuning": {
+    "churn_model": {
+      "baseline_auc": 0.8142646876662222,
+      "tuned_auc": 0.8182758796569539,
+      "baseline_precision_at_20": 0.8862559241706162,
+      "tuned_precision_at_20": 0.8957345971563981,
+      "best_params": {
+        "n_estimators": 364,
+        "max_depth": 3,
+        "learning_rate": 0.038609314129159016,
+        "subsample": 0.5327822249040789,
+        "colsample_bytree": 0.7039147285447093,
+        "min_child_weight": 1,
+        "gamma": 2.6405301479192484
+      },
+      "n_trials": 50
+    },
+    "forecasting_model": {
+      "baseline_mape": 38.08063228092431,
+      "tuned_mape": 38.90986256643602,
+      "best_params": {
+        "lookback": 30,
+        "hidden_size": 128,
+        "num_layers": 2,
+        "dropout": 0.2180499167861401,
+        "learning_rate": 0.0012010038053700386
+      },
+      "n_trials": 25
+    },
+    "permutation_importance_top5": [
+      {
+        "Feature": "AvgDaysBetweenOrders",
+        "Importance_Mean": 0.055947384527947154,
+        "Importance_Std": 0.006905610510797536
+      },
+      {
+        "Feature": "Recency",
+        "Importance_Mean": 0.05046281116187338,
+        "Importance_Std": 0.006754360344737081
+      },
+      {
+        "Feature": "RecencyRatio",
+        "Importance_Mean": 0.020857348265702905,
+        "Importance_Std": 0.003507511188021113
+      },
+      {
+        "Feature": "UniqueProducts",
+        "Importance_Mean": 0.010462677576914554,
+        "Importance_Std": 0.003618554371434041
+      },
+      {
+        "Feature": "TotalQuantity",
+        "Importance_Mean": 0.008566681968216456,
+        "Importance_Std": 0.0032324977282502825
+      }
+    ]
+  },
+  "drift": null,
+  "pipeline": {
+    "dag_id": "retailpulse_churn_retraining",
+    "schedule": "@daily",
+    "retries": 3,
+    "retry_delay_seconds": 300,
+    "promotion_threshold": -0.01,
+    "dag_file": "../airflow_dags/retailpulse_retraining_dag.py",
+    "last_test_run_no_drift": {
+      "action": "skipped",
+      "reason": "no_drift"
+    },
+    "last_test_run_drift": {
+      "timestamp": "2026-06-17 17:53:28.159038",
+      "pipeline": "RetailPulse_Churn_Retraining",
+      "action": "promoted",
+      "candidate_auc": 0.8142646876662222,
+      "production_auc": 0.8142646876662222,
+      "improvement": 0.0,
+      "message": "Model PROMOTED: AUC 0.8143 vs production 0.8143"
+    }
+  }
+}

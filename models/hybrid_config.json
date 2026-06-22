@@ -1,0 +1,13 @@
+{
+  "model_type": "Hybrid_Prophet_LSTM",
+  "alpha": 0.85,
+  "formula": "hybrid = alpha * prophet_pred + (1 - alpha) * lstm_pred",
+  "lookback": 30,
+  "prophet_mape": 31.08152641906247,
+  "lstm_mape": 38.08063228092431,
+  "hybrid_mape": 30.802926121266626,
+  "scaler_min": 0.0,
+  "scaler_max": 184367.28,
+  "test_start_date": "2011-07-21",
+  "test_end_date": "2011-12-09"
+}

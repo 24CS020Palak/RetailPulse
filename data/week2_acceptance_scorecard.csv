@@ -1,0 +1,5 @@
+ID,Capability,Target,Actual,Status
+F03,Demand Forecasting,MAPE <= 12%,30.80% MAPE,FAIL
+F04,Churn Prediction (AUC-ROC),AUC-ROC >= 0.88,0.8143,FAIL
+F04,Churn Prediction (Precision@Top20%),Precision@Top20% >= 0.75,0.8863,PASS
+F05,Inventory Optimization,25-40% reduction in overstock/understock,57.7% stockout reduction,CHECK

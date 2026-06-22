@@ -1,0 +1,47 @@
+{
+  "forecasting_pipeline": {
+    "no_drift_scenario": {
+      "alert": true,
+      "status": "ALERT - RETRAINING RECOMMENDED",
+      "drifted_columns": 2,
+      "total_columns": 4,
+      "drift_share": 0.5,
+      "dataset_drift_flag": true
+    },
+    "drifted_scenario": {
+      "alert": true,
+      "status": "ALERT - RETRAINING RECOMMENDED",
+      "drifted_columns": 2,
+      "total_columns": 4,
+      "drift_share": 0.5,
+      "dataset_drift_flag": true
+    }
+  },
+  "churn_pipeline": {
+    "no_drift_scenario": {
+      "alert": false,
+      "status": "OK - NO ACTION NEEDED",
+      "drifted_columns": 0,
+      "total_columns": 10,
+      "drift_share": 0.0,
+      "dataset_drift_flag": false
+    },
+    "drifted_scenario": {
+      "alert": false,
+      "status": "OK - NO ACTION NEEDED",
+      "drifted_columns": 3,
+      "total_columns": 10,
+      "drift_share": 0.3,
+      "dataset_drift_flag": false
+    },
+    "target_drift_simulated_churn_rate_reference": 0.5541666666666667,
+    "target_drift_simulated_churn_rate_current": 0.33055660734570236
+  },
+  "reports_generated": [
+    "Day12_drift_report_NO_DRIFT.html",
+    "Day12_drift_report_DRIFTED.html",
+    "Day12_churn_drift_report.html",
+    "Day12_churn_performance_report.html",
+    "Day12_forecast_performance_report.html"
+  ]
+}

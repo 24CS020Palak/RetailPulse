@@ -1,0 +1,25 @@
+{
+  "model_type": "XGBoost Churn Classifier",
+  "churn_window_days": 90,
+  "cutoff_date": "2011-09-10",
+  "n_customers": 5281,
+  "churn_rate": 0.5659912895284984,
+  "auc_roc": 0.8142646876662222,
+  "precision_at_top20": 0.8862559241706162,
+  "feature_columns": [
+    "Recency",
+    "Frequency",
+    "Monetary",
+    "UniqueProducts",
+    "TotalQuantity",
+    "Tenure",
+    "AvgOrderValue",
+    "AvgDaysBetweenOrders",
+    "AvgBasketSize",
+    "RecencyRatio"
+  ],
+  "scale_pos_weight": 0.766624843161857,
+  "promoted_at": "2026-06-17 17:53:28.157442",
+  "previous_production_auc": 0.8142646876662222,
+  "improvement": 0.0
+}

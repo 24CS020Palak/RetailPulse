@@ -1,0 +1,57 @@
+{
+  "churn_model": {
+    "baseline_auc": 0.8142646876662222,
+    "tuned_auc": 0.8182758796569539,
+    "baseline_precision_at_20": 0.8862559241706162,
+    "tuned_precision_at_20": 0.8957345971563981,
+    "best_params": {
+      "n_estimators": 364,
+      "max_depth": 3,
+      "learning_rate": 0.038609314129159016,
+      "subsample": 0.5327822249040789,
+      "colsample_bytree": 0.7039147285447093,
+      "min_child_weight": 1,
+      "gamma": 2.6405301479192484
+    },
+    "n_trials": 50
+  },
+  "forecasting_model": {
+    "baseline_mape": 38.08063228092431,
+    "tuned_mape": 38.90986256643602,
+    "best_params": {
+      "lookback": 30,
+      "hidden_size": 128,
+      "num_layers": 2,
+      "dropout": 0.2180499167861401,
+      "learning_rate": 0.0012010038053700386
+    },
+    "n_trials": 25
+  },
+  "permutation_importance_top5": [
+    {
+      "Feature": "AvgDaysBetweenOrders",
+      "Importance_Mean": 0.055947384527947154,
+      "Importance_Std": 0.006905610510797536
+    },
+    {
+      "Feature": "Recency",
+      "Importance_Mean": 0.05046281116187338,
+      "Importance_Std": 0.006754360344737081
+    },
+    {
+      "Feature": "RecencyRatio",
+      "Importance_Mean": 0.020857348265702905,
+      "Importance_Std": 0.003507511188021113
+    },
+    {
+      "Feature": "UniqueProducts",
+      "Importance_Mean": 0.010462677576914554,
+      "Importance_Std": 0.003618554371434041
+    },
+    {
+      "Feature": "TotalQuantity",
+      "Importance_Mean": 0.008566681968216456,
+      "Importance_Std": 0.0032324977282502825
+    }
+  ]
+}

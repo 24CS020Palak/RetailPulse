@@ -1,0 +1,21 @@
+{
+  "dag_id": "retailpulse_churn_retraining",
+  "schedule": "@daily",
+  "retries": 3,
+  "retry_delay_seconds": 300,
+  "promotion_threshold": -0.01,
+  "dag_file": "../airflow_dags/retailpulse_retraining_dag.py",
+  "last_test_run_no_drift": {
+    "action": "skipped",
+    "reason": "no_drift"
+  },
+  "last_test_run_drift": {
+    "timestamp": "2026-06-17 17:53:28.159038",
+    "pipeline": "RetailPulse_Churn_Retraining",
+    "action": "promoted",
+    "candidate_auc": 0.8142646876662222,
+    "production_auc": 0.8142646876662222,
+    "improvement": 0.0,
+    "message": "Model PROMOTED: AUC 0.8143 vs production 0.8143"
+  }
+}
