@@ -1,0 +1,42 @@
+/*
+RetailPulse Dashboard - Shared Styles
+=======================================
+Loaded once by app.py and applied to every page since app.py's code
+runs before every page render (it is the "picture frame" in Streamlit's
+own terminology for st.navigation entrypoint files).
+*/
+
+/* Metric cards: tighten up the default Streamlit metric widget spacing
+   and add a subtle card-like appearance */
+div[data-testid="stMetric"] {
+    background-color: #f8f9fb;
+    border: 1px solid #e6e8eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+div[data-testid="stMetricLabel"] {
+    font-size: 0.85rem;
+    color: #5a6472;
+}
+
+div[data-testid="stMetricValue"] {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+/* Section headers inside pages - a consistent look for st.subheader */
+h2, h3 {
+    color: #1f2937;
+}
+
+/* Sidebar branding spacing */
+section[data-testid="stSidebar"] .block-container {
+    padding-top: 1.5rem;
+}
+
+/* Make dataframes/tables a bit less cramped */
+div[data-testid="stDataFrame"] {
+    border-radius: 8px;
+    overflow: hidden;
+}
