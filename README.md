@@ -305,38 +305,6 @@ Features:
 
 ---
 
-# 📸 Dashboard Screenshots
-
-## Home Dashboard
-
-![Home](screenshots/home.png)
-
-## Sales Dashboard
-
-![Sales](screenshots/sales.png)
-
-## Customer Dashboard
-
-![Customer](screenshots/customer.png)
-
-## Forecast Dashboard
-
-![Forecast](screenshots/forecast.png)
-
-## Inventory Dashboard
-
-![Inventory](screenshots/inventory.png)
-
-## Alerts Dashboard
-
-![Alerts](screenshots/alerts.png)
-
-## Export Center
-
-![Export](screenshots/export.png)
-
----
-
 # 🚀 Installation
 
 Clone Repository
