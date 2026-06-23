@@ -9,3 +9,4 @@ prophet
 mlflow
 evidently
 openpyxl
+streamlit-extras
