@@ -10,8 +10,19 @@ import json
 import os
 import streamlit as st
 
-DATA_DIR = "../data"
-MODELS_DIR = "../models"
+# ============================================================
+# PATHS (Cloud-safe)
+# ============================================================
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+STREAMLIT_APP_DIR = os.path.dirname(BASE_DIR)
+
+PROJECT_ROOT = os.path.dirname(STREAMLIT_APP_DIR)
+
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
 
 
 @st.cache_data
