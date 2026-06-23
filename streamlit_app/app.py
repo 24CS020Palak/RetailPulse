@@ -14,8 +14,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-with open("utils/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+css_path = os.path.join(BASE_DIR, "utils", "styles.css")
+
+with open(css_path) as f:
+    st.markdown(
+        f"<style>{f.read()}</style>",
+        unsafe_allow_html=True
+    )
 
 with st.sidebar:
 
