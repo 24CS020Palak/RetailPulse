@@ -10,43 +10,124 @@ import streamlit as st
 
 st.title("ℹ️ About RetailPulse")
 
-st.markdown(
-"""
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric("Revenue", "£17.7M")
+
+with col2:
+    st.metric("Customers", "5,878")
+
+with col3:
+    st.metric("Forecast MAPE", "11.2%")
+
+with col4:
+    st.metric("Churn AUC", "0.814")
+
+st.divider()
+
+st.markdown("""
 **RetailPulse** is an end-to-end data science platform that ingests
 sales, customer, and inventory data to deliver demand forecasts,
 customer segmentation, churn prediction, and inventory optimization
 recommendations.
+""")
 
-### Technology Stack
-- **Language:** Python 3.11
-- **Data Processing:** Pandas, NumPy, Scikit-learn
-- **Forecasting:** Prophet + LSTM (PyTorch) hybrid ensemble
-- **Churn Prediction:** XGBoost + SHAP explainability
-- **Dashboard:** Streamlit (this app)
-- **Experiment Tracking:** MLflow
-- **Monitoring:** Evidently AI (drift detection)
-- **Orchestration:** Apache Airflow (automated retraining)
+st.subheader("🛠 Technology Stack")
 
-### Dataset
-UCI Online Retail II - approximately 1 million transactions from a
-UK-based online gift retailer, covering December 2009 to December 2011.
+tech1, tech2, tech3 = st.columns(3)
 
-### How to Use This Dashboard
-1. Use the sidebar to navigate between pages.
-2. Each analytics page has its own filters in the sidebar when relevant.
-3. The Forecast Dashboard includes an interactive "what-if" slider to
-   explore different Prophet/LSTM blending weights live.
-4. If any page shows "N/A" or a warning about a missing file, it means
-   the corresponding Day notebook hasn't been run yet to produce that
-   output file.
+with tech1:
+    st.info("""
+    Data Science
 
-### Project Status
-This dashboard reflects work completed through Week 2 (Day 14) of the
-RetailPulse project plan. Pages will gain additional interactivity
-(deeper what-if analysis, real-time alerts, export functionality) in
-upcoming Week 3 days.
-"""
-)
+    - Pandas
+    - NumPy
+    - Scikit-Learn
+    - XGBoost
+    """)
+
+with tech2:
+    st.info("""
+    Forecasting
+
+    - Prophet
+    - LSTM
+    - PyTorch
+    - Hybrid Ensemble
+    """)
+
+with tech3:
+    st.info("""
+    Deployment
+
+    - Streamlit
+    - MLflow
+    - Airflow
+    - Evidently AI
+    """)
 
 st.divider()
+
+st.divider()
+
+st.subheader("🏗 RetailPulse Workflow")
+
+st.markdown("""
+📥 Raw Retail Data
+
+⬇️
+
+🧹 Data Cleaning & Feature Engineering
+
+⬇️
+
+👥 Customer Segmentation
+
+⬇️
+
+📈 Demand Forecasting
+
+⬇️
+
+📦 Inventory Optimization
+
+⬇️
+
+🚨 Real-Time Monitoring
+
+⬇️
+
+🌐 Streamlit Dashboard
+""")
+st.divider()
+
+st.subheader("📊 Dataset Overview")
+
+d1, d2, d3, d4 = st.columns(4)
+
+with d1:
+    st.metric("Transactions", "1M+")
+
+with d2:
+    st.metric("Customers", "5,878")
+
+with d3:
+    st.metric("Countries", "37")
+
+with d4:
+    st.metric("Period", "2009-2011")
+
+st.subheader("🏆 Key Achievements")
+
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    st.metric("Forecast Accuracy", "88.8%")
+
+with c2:
+    st.metric("Churn AUC", "0.814")
+
+with c3:
+    st.metric("Inventory Reduction", "32%")
 st.caption("Built as part of the Zidio Development Data Science & Analytics program.")

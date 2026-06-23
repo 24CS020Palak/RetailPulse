@@ -1,3 +1,4 @@
+
 """
 RetailPulse Dashboard - Sales Dashboard Page
 ===============================================
@@ -13,6 +14,8 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
+import plotly.express as px
+from streamlit_extras.metric_cards import style_metric_cards
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -79,11 +82,33 @@ st.divider()
 # ============================================================
 # REVENUE TREND CHART
 # ============================================================
-st.subheader("Revenue Trend")
+st.subheader("📈 Revenue Trend")
 
-trend_data = filtered_df.groupby(filtered_df["InvoiceDate"].dt.date)["TotalRevenue"].sum()
-trend_data.index.name = "Date"
-st.line_chart(trend_data)
+trend_data = (
+    filtered_df.groupby(filtered_df["InvoiceDate"].dt.date)["TotalRevenue"]
+    .sum()
+    .reset_index()
+)
+
+trend_data.columns = ["Date", "Revenue"]
+
+fig = px.line(
+    trend_data,
+    x="Date",
+    y="Revenue",
+    title="Daily Revenue Trend",
+    markers=True
+)
+
+fig.update_layout(
+    template="plotly_dark",
+    height=500
+)
+
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
 
 st.divider()
 
@@ -93,24 +118,61 @@ st.divider()
 left_col, right_col = st.columns(2)
 
 with left_col:
-    st.subheader("Top 10 Products by Revenue")
+    st.subheader("🏆 Top Products")
+
     top_products = (
         filtered_df.groupby("Description")["TotalRevenue"]
         .sum()
         .sort_values(ascending=False)
         .head(10)
+        .reset_index()
     )
-    st.bar_chart(top_products)
+
+    fig = px.bar(
+        top_products,
+        x="Description",
+        y="TotalRevenue",
+        title="Top 10 Products by Revenue",
+        color="TotalRevenue"
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=500
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
 with right_col:
-    st.subheader("Revenue by Country")
+    st.subheader("🌍 Revenue by Country")
+
     country_revenue = (
         filtered_df.groupby("Country")["TotalRevenue"]
         .sum()
         .sort_values(ascending=False)
         .head(10)
+        .reset_index()
     )
-    st.bar_chart(country_revenue)
+
+    fig = px.pie(
+        country_revenue,
+        values="TotalRevenue",
+        names="Country",
+        title="Revenue Share by Country"
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=500
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
 st.divider()
 

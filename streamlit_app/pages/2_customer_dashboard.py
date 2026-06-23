@@ -17,7 +17,7 @@ depth (multiple charts, a filterable table, an explainability view)
 that cramming everything into one un-tabbed scroll would be
 overwhelming and hard to navigate during a live demo.
 """
-
+import plotly.express as px
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -52,6 +52,15 @@ if rfm is None:
     st.stop()
 
 has_segments = "KMeans_Label" in rfm.columns
+segment_map = {
+    0: "Loyal Customers",
+    1: "Champions",
+    2: "At Risk",
+    3: "Lost Customers"
+}
+
+if "KMeans_Label" in rfm.columns:
+    rfm["Segment"] = rfm["KMeans_Label"].map(segment_map)
 
 # ============================================================
 # TOP-LEVEL KPI ROW
@@ -99,59 +108,154 @@ with tab1:
         st.info("Segment labels (KMeans_Label) not found - run Day 3 notebook first.")
     else:
         st.subheader("Customer Segments")
-
+        
         profile = build_segment_profile(rfm)
-
-        seg_col1, seg_col2 = st.columns([1, 1])
-
-        with seg_col1:
-            st.markdown("**Segment Sizes**")
-            chart_data = profile.set_index("KMeans_Label")["Count"]
-            st.bar_chart(chart_data)
-
-        with seg_col2:
-            st.markdown("**Revenue Share by Segment**")
-            st.caption("A segment can be small in headcount but large in revenue - this chart shows that distinction explicitly.")
-            rev_share = calculate_segment_revenue_share(rfm)
-            st.bar_chart(rev_share.set_index("KMeans_Label")["Revenue_Share_Pct"])
-
+        
+        profile["Segment"] = profile["KMeans_Label"].map(segment_map)
+        
+        rev_share = calculate_segment_revenue_share(rfm)
+        
+        if "KMeans_Label" in rev_share.columns:
+            rev_share["Segment"] = rev_share["KMeans_Label"].map(segment_map)
+        
+        left_col, right_col = st.columns(2)
+        
+        with left_col:
+        
+            st.markdown("### Customer Segment Distribution")
+        
+            segment_counts = rfm["Segment"].value_counts()
+        
+            fig = px.pie(
+                values=segment_counts.values,
+                names=segment_counts.index,
+                hole=0.4,
+                title="Customer Segments"
+            )
+        
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with right_col:
+        
+            st.markdown("### Revenue Share by Segment")
+        
+            fig = px.bar(
+                rev_share,
+                x="Segment",
+                y="Revenue_Share_Pct",
+                color="Segment",
+                title="Revenue Share by Segment"
+            )
+        
+            st.plotly_chart(fig, use_container_width=True)
+        
         st.divider()
-
+        
         st.subheader("Segment Profiles (Average RFM Values)")
+        
+        display_profile = profile[
+            [
+                "Segment",
+                "Count",
+                "Avg_Recency",
+                "Avg_Frequency",
+                "Avg_Monetary",
+                "Pct_of_Customers"
+            ]
+        ]
+        
         st.dataframe(
-            profile.style.format({
-                "Avg_Recency": "{:.1f}", "Avg_Frequency": "{:.1f}",
-                "Avg_Monetary": "£{:,.2f}", "Pct_of_Customers": "{:.1f}%"
+            display_profile.style.format({
+                "Avg_Recency": "{:.1f}",
+                "Avg_Frequency": "{:.1f}",
+                "Avg_Monetary": "£{:,.2f}",
+                "Pct_of_Customers": "{:.1f}%"
             }),
             width="stretch"
         )
-
+        
         st.divider()
-
-        st.subheader("Recency vs Monetary by Segment")
-        if {"Recency", "Monetary", "KMeans_Label"}.issubset(rfm.columns):
-            st.scatter_chart(rfm, x="Recency", y="Monetary", color="KMeans_Label")
-        st.caption("Lower Recency (more recent buyers) and higher Monetary (bigger spenders) is the ideal top-left region.")
-
+        
+        st.subheader("Recency vs Monetary Analysis")
+        
+        fig = px.scatter(
+            rfm,
+            x="Recency",
+            y="Monetary",
+            color="Segment",
+            size="Frequency",
+            hover_data=["Frequency"],
+            height=500
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        st.caption(
+            "Lower Recency (more recent buyers) and higher Monetary "
+            "(bigger spenders) is the ideal top-left region."
+        )
+        
         st.divider()
-
+        
+        st.subheader("📊 Average Segment Performance")
+        
+        segment_summary = (
+            rfm.groupby("Segment")
+            [["Recency", "Frequency", "Monetary"]]
+            .mean()
+            .reset_index()
+        )
+        
+        fig = px.bar(
+            segment_summary,
+            x="Segment",
+            y="Monetary",
+            color="Segment",
+            title="Average Monetary Value by Segment"
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        st.divider()
+        
         st.subheader("Recommended Actions per Segment")
+        
         for _, row in profile.iterrows():
-            seg_name = row["KMeans_Label"]
-            with st.expander(f"{seg_name} ({int(row['Count'])} customers, {row['Pct_of_Customers']:.1f}%)"):
+        
+            seg_name = row["Segment"]
+        
+            with st.expander(
+                f"{seg_name} ({int(row['Count'])} customers, {row['Pct_of_Customers']:.1f}%)"
+            ):
+        
                 m1, m2, m3 = st.columns(3)
+        
                 with m1:
-                    st.metric("Avg Recency", f"{row['Avg_Recency']:.0f} days")
+                    st.metric(
+                        "Avg Recency",
+                        f"{row['Avg_Recency']:.0f} days"
+                    )
+        
                 with m2:
-                    st.metric("Avg Frequency", f"{row['Avg_Frequency']:.1f} orders")
+                    st.metric(
+                        "Avg Frequency",
+                        f"{row['Avg_Frequency']:.1f}"
+                    )
+        
                 with m3:
-                    st.metric("Avg Monetary", f"£{row['Avg_Monetary']:,.0f}")
-                st.info(f"**Recommended action:** {get_segment_action(seg_name)}")
-
+                    st.metric(
+                        "Avg Monetary",
+                        f"£{row['Avg_Monetary']:,.0f}"
+                    )
+        
+                st.info(
+                    f"Recommended action: {get_segment_action(seg_name)}"
+                )
+        
         st.divider()
+        
         with st.expander("View full RFM table"):
             st.dataframe(rfm, width="stretch")
-
 # ============================================================
 # TAB 2: CHURN RISK EXPLORER
 # ============================================================

@@ -18,11 +18,13 @@ staying on ONE page (as opposed to making each tab its OWN separate
 page in the sidebar, which would fragment what is conceptually a
 single "Forecast Dashboard" feature per the project's page list).
 """
-
+import plotly.graph_objects as go
+import plotly.express as px
 import streamlit as st
 import pandas as pd
 import numpy as np
 import sys
+from streamlit_extras.metric_cards import style_metric_cards
 import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -80,6 +82,7 @@ with col4:
               delta_color="normal" if target_met else "inverse")
 
 st.divider()
+style_metric_cards()
 
 # ============================================================
 # TABS
@@ -116,7 +119,23 @@ with tab1:
         chart_pivot = combined.pivot_table(
             index="Date", columns="Source", values="Revenue", aggfunc="first"
         )
-        st.line_chart(chart_pivot)
+        fig = px.line(
+            combined,
+            x="Date",
+            y="Revenue",
+            color="Source",
+            title="Historical Revenue vs Forecast"
+        )
+        
+        fig.update_layout(
+            height=600,
+            template="plotly_dark"
+        )
+        
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
     else:
         # Fall back to just the test-period forecast if historical data isn't available
         st.info("Historical series not found - showing test period only.")
@@ -154,7 +173,52 @@ with tab1:
         "Upper Bound": upper_band,
     }).set_index("Date")
 
-    st.line_chart(band_df[["Actual", "Forecast", "Lower Bound", "Upper Bound"]])
+    fig = go.Figure()
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=results["actual"],
+            name="Actual"
+        )
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=results["hybrid_pred"],
+            name="Forecast"
+        )
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=upper_band,
+            name="Upper Bound",
+            line=dict(dash="dash")
+        )
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=lower_band,
+            name="Lower Bound",
+            line=dict(dash="dash")
+        )
+    )
+    
+    fig.update_layout(
+        title="Forecast Confidence Interval",
+        template="plotly_dark",
+        height=600
+    )
+    
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
     st.caption(
         f"Approximate {confidence_pct}% confidence band, built from "
         f"the hybrid model's {hybrid_mape_value:.2f}% historical MAPE."
@@ -170,7 +234,50 @@ with tab2:
         ["actual", "prophet_pred", "lstm_pred", "hybrid_pred"]
     ]
     comparison_chart_data.columns = ["Actual", "Prophet", "LSTM", "Hybrid"]
-    st.line_chart(comparison_chart_data)
+    fig = go.Figure()
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=results["actual"],
+            name="Actual"
+        )
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=results["prophet_pred"],
+            name="Prophet"
+        )
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=results["lstm_pred"],
+            name="LSTM"
+        )
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=results["ds"],
+            y=results["hybrid_pred"],
+            name="Hybrid"
+        )
+    )
+    
+    fig.update_layout(
+        title="Model Comparison",
+        template="plotly_dark",
+        height=600
+    )
+    
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
     st.divider()
 
@@ -195,10 +302,40 @@ with tab2:
         width="stretch"
     )
     st.caption("Highlighted cells show the best (lowest error) model per metric.")
+    fig = px.bar(
+        metrics_df,
+        x="Model",
+        y="MAPE (%)",
+        color="Model",
+        title="MAPE Comparison"
+    )
+    
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
     st.divider()
 
     st.subheader("Residual Comparison")
+    forecast_error = pd.DataFrame({
+        "Date": results["ds"],
+        "Error":
+        results["actual"] -
+        results["hybrid_pred"]
+    })
+    
+    fig = px.bar(
+        forecast_error.tail(30),
+        x="Date",
+        y="Error",
+        title="Last 30 Days Forecast Error"
+    )
+    
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
     st.markdown(
         "Residual = Actual − Predicted. Points scattered evenly around "
         "zero indicate unbiased predictions; a consistent pattern above "
@@ -211,7 +348,26 @@ with tab2:
         "LSTM Residual": results["actual"] - results["lstm_pred"],
         "Hybrid Residual": results["actual"] - results["hybrid_pred"],
     }).set_index("Date")
-    st.line_chart(residual_df)
+    fig = px.line(
+        residual_df.reset_index(),
+        x="Date",
+        y=[
+            "Prophet Residual",
+            "LSTM Residual",
+            "Hybrid Residual"
+        ],
+        title="Residual Comparison"
+    )
+    
+    fig.update_layout(
+        template="plotly_dark",
+        height=500
+    )
+    
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
 # ============================================================
 # TAB 3: WHAT-IF ANALYSIS

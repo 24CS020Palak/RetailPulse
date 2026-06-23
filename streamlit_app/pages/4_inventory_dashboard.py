@@ -24,10 +24,13 @@ which is exactly what utils/inventory_utils.py was built to support.
 """
 
 import streamlit as st
+import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import sys
 import os
+from streamlit_extras.metric_cards import style_metric_cards
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -84,7 +87,7 @@ with col4:
         st.metric("Avg Inventory Reduction", "N/A")
 
 st.divider()
-
+style_metric_cards()
 # ============================================================
 # TABS
 # ============================================================
@@ -128,12 +131,34 @@ with tab1:
         st.divider()
 
         chart_col1, chart_col2 = st.columns(2)
+        
         with chart_col1:
-            st.markdown("**Products per Class**")
-            st.bar_chart(abc_summary.set_index("ABC_Class")["NumProducts"])
+        
+            fig = px.pie(
+                abc_summary,
+                names="ABC_Class",
+                values="NumProducts",
+                title="Products Distribution"
+            )
+        
+            st.plotly_chart(
+                fig,
+                use_container_width=True
+            )
+        
         with chart_col2:
-            st.markdown("**Revenue Share per Class**")
-            st.bar_chart(abc_summary.set_index("ABC_Class")["PctOfRevenue"])
+        
+            fig = px.pie(
+                abc_summary,
+                names="ABC_Class",
+                values="PctOfRevenue",
+                title="Revenue Share"
+            )
+        
+            st.plotly_chart(
+                fig,
+                use_container_width=True
+            )
 
         st.divider()
 
@@ -146,11 +171,52 @@ with tab1:
         )
         sorted_abc = abc_data.sort_values("TotalRevenue", ascending=False).reset_index(drop=True)
         sorted_abc["Rank"] = sorted_abc.index + 1
-        st.line_chart(sorted_abc.set_index("Rank")["CumPct"])
+        fig = px.line(
+            sorted_abc,
+            x="Rank",
+            y="CumPct",
+            title="ABC Pareto Curve"
+        )
+        
+        fig.update_layout(
+            height=500
+        )
+        
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
 
         st.divider()
         with st.expander("View full product classification table"):
             st.dataframe(abc_data, width="stretch")
+
+
+        st.divider()
+        
+        st.subheader("Top 20 Revenue Products")
+        
+        top_products = (
+            abc_data
+            .sort_values(
+                "TotalRevenue",
+                ascending=False
+            )
+            .head(20)
+        )
+        
+        fig = px.bar(
+            top_products,
+            x="Description",
+            y="TotalRevenue",
+            color="ABC_Class",
+            title="Top Products by Revenue"
+        )
+        
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
     else:
         st.info("ABC classification data not found - run Day 10 notebook first.")
 
@@ -206,6 +272,24 @@ with tab2:
         n_reorder = (filtered_recs["Urgency"] == "Reorder Now").sum()
         st.metric("Reorder Now", f"{n_reorder:,}")
 
+    st.subheader("Urgency Distribution")
+        
+    urgency_counts = (
+        filtered_recs["Urgency"]
+        .value_counts()
+    )
+        
+    fig = px.pie(
+        values=urgency_counts.values,
+        names=urgency_counts.index,
+        title="Inventory Status"
+    )
+        
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+    
     def highlight_urgency(row):
         color_map = {"Critical": "#f8d7da", "Reorder Now": "#fff3cd", "Healthy": "#d4edda"}
         color = color_map.get(row["Urgency"], "")
@@ -297,7 +381,21 @@ with tab3:
     timeline_df["Reorder Point"] = product_row["RecommendedReorderPoint"]
     timeline_df["Safety Stock"] = product_row["RecommendedSafetyStock"]
 
-    st.line_chart(timeline_df)
+    fig = px.line(
+        timeline_df.reset_index(),
+        x="Day",
+        y=[
+            "Stock Level",
+            "Reorder Point",
+            "Safety Stock"
+        ],
+        title="Inventory Timeline"
+    )
+    
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
     st.caption(
         "When the orange Reorder Point line is crossed, a new order is "
         "triggered (arriving after a 7-day lead time). The simulation "
@@ -381,7 +479,20 @@ with tab4:
         "Naive Policy": comparison["naive_daily_levels"],
         "Optimized Policy": comparison["optimized_daily_levels"],
     }).set_index("Day")
-    st.line_chart(timeline_compare_df)
+    fig = px.line(
+        timeline_compare_df.reset_index(),
+        x="Day",
+        y=[
+            "Naive Policy",
+            "Optimized Policy"
+        ],
+        title="Policy Comparison"
+    )
+    
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
     st.caption(
         f"Simulated over {sim_horizon} days using the SAME randomly "
