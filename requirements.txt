@@ -10,3 +10,4 @@ mlflow
 evidently
 openpyxl
 streamlit-extras
+fpdf2
