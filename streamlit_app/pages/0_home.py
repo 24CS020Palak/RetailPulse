@@ -80,9 +80,9 @@ with col4:
 
 import plotly.express as px
 
-daily_revenue = pd.read_csv(
-    "../data/daily_revenue_full.csv"
-)
+from utils.data_loader import load_daily_revenue
+
+daily_revenue = load_daily_revenue()
 
 fig = px.line(
     daily_revenue,
